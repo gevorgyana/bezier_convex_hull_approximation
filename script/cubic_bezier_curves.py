@@ -11,7 +11,9 @@ assert(num_points_in_dataset > 2)
 # this script does not use numpy, so convert them to regular
 # lists after that
 
-points = [[1, 1], [2, 3], [2, 2], [5, 5]]
+#points = [[1, 1], [2, 3], [2, 2], [5, 5]]
+
+points = [[1, 1], [2, 2], [1, 2], [2, 1]]
 
 print ("The points")
 for point in points:
@@ -81,12 +83,16 @@ print()
 # step. To get more granular curve, decrease the step.
 
 def bezier_cubic(t, w : []):
+
+    print(f"T = {t}")
+
     t2 = t * t
     t3 = t2 * t
     mt = 1 - t
     mt2 = mt * mt
     mt3 = mt2 * mt
-    return mt3 + 3 * mt2 * t + 3 * mt * t2 + t3
+    return w[0] * mt3 + 3 * w[1] * mt2 * t + \
+        3 * w[2] * mt * t2 + w[3] * t3
 
 plot_points = []
 
@@ -109,15 +115,22 @@ while (i < len(granular_points)):
     print(f'The weights are: {wx}, {wy}')
     print()
 
+#    exit()
+
     plt.scatter(wx, wy, color = 'red')
 
-    for t in range(1, 101):
-        x = bezier_cubic(100 / t, wx)
-        y = bezier_cubic(100 / t, wy)
+    for t in range(1, 100):
+        x = bezier_cubic(t / 100, wx)
+        y = bezier_cubic(t / 100, wy)
         plot_points.append([x, y])
 
     i += 4
 
-#print(plot_points)
-#plt.scatter([1, 2, 3, 4, 5], [1, 2, 3, 5, 4])
+xvals = [p[0] for p in plot_points]
+yvals = [p[1] for p in plot_points]
+
+print(xvals)
+print(yvals)
+
+plt.scatter(xvals, yvals, color = 'blue')
 plt.show()
