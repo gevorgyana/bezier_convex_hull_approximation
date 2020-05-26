@@ -11,9 +11,9 @@ assert(num_points_in_dataset > 2)
 # this script does not use numpy, so convert them to regular
 # lists after that
 
-#points = [[1, 1], [2, 3], [2, 2], [5, 5]]
+points = [[1, 1], [2, 3], [2, 2], [5, 5]]
 
-points = [[1, 1], [2, 2], [1, 2], [2, 1]]
+#points = [[1, 1], [2, 2], [1, 2], [2, 1]]
 
 print ("The points")
 for point in points:
@@ -124,7 +124,7 @@ while (i < len(granular_points)):
         y = bezier_cubic(t / 100, wy)
         plot_points.append([x, y])
 
-    i += 4
+    i += 3
 
 xvals = [p[0] for p in plot_points]
 yvals = [p[1] for p in plot_points]
