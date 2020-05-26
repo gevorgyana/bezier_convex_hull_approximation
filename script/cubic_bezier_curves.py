@@ -1,14 +1,15 @@
 from scipy.spatial import ConvexHull
-import numpy as np
+import matplotlib.pyplot as plt
 
 num_points_in_dataset = 4
 
 # should be more than 2
 assert(num_points_in_dataset > 2)
 
-# generate the points and build a real convex hull from them
-#points = np.random.rand(num_points_in_dataset, 2)
-# then convert them to usual lists
+# generate the points
+# points = np.random.rand(num_points_in_dataset, 2)
+# this script does not use numpy, so convert them to regular
+# lists after that
 
 points = [[1, 1], [2, 3], [2, 2], [5, 5]]
 
@@ -17,8 +18,8 @@ for point in points:
     print(point)
 print()
 
-# hull indices are a sorted set of indices that make up the
-# convex hull
+# Build a convex hull from points. Hull indices are sorted
+# counter-clockwise in the resulting object.
 
 hull = ConvexHull(points)
 print ("The convex hull constits of the following points (in indices)")
@@ -27,7 +28,7 @@ for i in hull.vertices:
 print()
 
 # The idea of the algorithm is to create a better point representation
-# of the initial convex hull in terms of points, and then build multiple
+# of the initial convex hull, and then build multiple
 # Bezier curves from them. Here is the article that I learned this from
 # http://www.malinc.se/m/MakingABezierSpline.php
 
@@ -59,5 +60,64 @@ for i in range(len(hull.vertices)):
     granular_points.append([points[i][0] - dx, points[i][1] - dy])
     granular_points.append([points[i][0] - 2 * dx, points[i][1] - 2 * dy])
 
-print("The resulting coarse points are")
+assert(len(granular_points) == len(hull.vertices) * 3)
+
+print("The resulting granular points are")
 print(granular_points)
+print()
+
+print("Approximating the convex hull using cubic Bezier splines")
+print()
+
+# Weights should be either four x-values of the points that
+# are used to build this Bezier curve, or their y-values.
+# Some more intuition behind the function. It starts at w[0],
+# is controlled by w[1] and w[2], and ends at w[3]. For more
+# understanding, read this: https://pomax.github.io/bezierinfo/
+
+# To draw the line, pass the weights w[] as the x-values or y-values
+# of the four points used to build the Bezier curve, then iterate,
+# for example, in a for-loop, varying `t` from 0 to 1 with a small
+# step. To get more granular curve, decrease the step.
+
+def bezier_cubic(t, w : []):
+    t2 = t * t
+    t3 = t2 * t
+    mt = 1 - t
+    mt2 = mt * mt
+    mt3 = mt2 * mt
+    return mt3 + 3 * mt2 * t + 3 * mt * t2 + t3
+
+plot_points = []
+
+# I know it is ugly....
+i = 0
+while (i < len(granular_points)):
+    print(f'Building the bezier curve from the points {i} to {i + 3}')
+    wx = [
+        granular_points[i][0],
+        granular_points[(i + 1) % len(granular_points)][0],
+        granular_points[(i + 2) % len(granular_points)][0],
+        granular_points[(i + 3) % len(granular_points)][0]
+    ]
+    wy = [
+        granular_points[i][1],
+        granular_points[(i + 1) % len(granular_points)][1],
+        granular_points[(i + 2) % len(granular_points)][1],
+        granular_points[(i + 3) % len(granular_points)][1]
+    ]
+    print(f'The weights are: {wx}, {wy}')
+    print()
+
+    plt.scatter(wx, wy, color = 'red')
+
+    for t in range(1, 101):
+        x = bezier_cubic(100 / t, wx)
+        y = bezier_cubic(100 / t, wy)
+        plot_points.append([x, y])
+
+    i += 4
+
+#print(plot_points)
+#plt.scatter([1, 2, 3, 4, 5], [1, 2, 3, 5, 4])
+plt.show()
